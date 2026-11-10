@@ -1,0 +1,131 @@
+{
+  "schema": "feasible-multi-agent-datacenter-miqp-instance",
+  "schema_version": 3,
+  "generated_utc": "2026-11-10T05:10:27.988+00:00",
+  "instance_name": "dc_agents_0010_tasks_02000_rep_01_seed_62135863e3d37a8d",
+  "instance": {
+    "agent_count": 10,
+    "task_count": 2000,
+    "option_count": 29926,
+    "horizon_buckets": 1214,
+    "minimum_requested_horizon": 96,
+    "bucket_minutes": 15,
+    "replication": 1,
+    "rack_size": 20,
+    "rack_count": 1
+  },
+  "randomness": {
+    "master_seed": 20261107,
+    "instance_seed": 7067089426321734285,
+    "stream_policy": "Separate SeedSequence streams for agents, tasks, planted scheduling, alternatives, and topology."
+  },
+  "model": {
+    "class": "cooperative_binary_miqp",
+    "direction": "minimize",
+    "objective": "c^T z + beta z^T B^T (I_horizon kron H_agent) B z",
+    "beta": 1.0,
+    "binary_domain": "z[j] in {0,1}",
+    "task_constraints": "Exactly one candidate option is selected per task.",
+    "capacity_constraints": "Time-indexed GPU, CPU, and memory usage cannot exceed agent capacities.",
+    "q_representation": "factorized_sparse",
+    "gurobi_nonconvex_parameter": 2
+  },
+  "feasibility_construction": {
+    "method": "planted_serial_per_agent_schedule",
+    "dynamic_horizon": true,
+    "description": "Each task is generated from a feasible host. Tasks assigned to the same planted agent are serialized. The planted option is the first candidate for every task.",
+    "witness_arrays": [
+      "planted_agent",
+      "planted_start",
+      "planted_end",
+      "planted_option",
+      "planted_z"
+    ]
+  },
+  "array_conventions": {
+    "task_candidate_blocks": "Options for task t occupy [task_candidate_row_ptr[t], task_candidate_row_ptr[t+1]).",
+    "capacity_matrix": {
+      "format": "COO",
+      "shape": [
+        36420,
+        29926
+      ],
+      "row_formula": "((time * agent_count + agent) * 3 + resource)",
+      "resource_order": [
+        "gpu",
+        "cpu",
+        "memory"
+      ]
+    },
+    "occupancy_matrix_B": {
+      "format": "COO",
+      "shape": [
+        12140,
+        29926
+      ],
+      "row_formula": "time * agent_count + agent"
+    },
+    "interaction_matrix_H": {
+      "format": "COO",
+      "shape": [
+        10,
+        10
+      ]
+    }
+  },
+  "validation": {
+    "passed": true,
+    "integer_witness_stored": true,
+    "exactly_one_option_per_task": true,
+    "all_candidates_statically_eligible": true,
+    "time_windows_valid": true,
+    "capacity_feasible": true,
+    "maximum_capacity_violation": 0.0,
+    "violating_capacity_rows": 0,
+    "candidate_count_min": 4,
+    "candidate_count_max": 16,
+    "candidate_count_mean": 14.963,
+    "planted_objective": {
+      "linear_objective": 5370.476385868371,
+      "quadratic_objective": 5640.545639994335,
+      "total_objective": 11011.022025862705
+    }
+  },
+  "solver_validation": {
+    "mode": "both",
+    "gurobi": {
+      "requested": true,
+      "available": true,
+      "verified": true,
+      "status_code": 2,
+      "status": "feasible"
+    },
+    "scip": {
+      "requested": true,
+      "available": true,
+      "verified": true,
+      "status": "optimal"
+    }
+  },
+  "statistics": {
+    "capacity_nonzeros": 293553,
+    "occupancy_nonzeros": 97851,
+    "interaction_nonzeros": 34,
+    "candidate_count_min": 4,
+    "candidate_count_max": 16,
+    "candidate_count_mean": 14.963,
+    "mean_task_duration": 3.1685,
+    "maximum_planted_completion_time": 1156
+  },
+  "file": {
+    "npz_file": "dc_agents_0010_tasks_02000_rep_01_seed_62135863e3d37a8d.npz",
+    "npz_sha256": "eed383ea3adc92f93ce5042664b45f5f6e64fb4aab1c41c9980a98a5cad57846",
+    "npz_size_bytes": 1004447
+  },
+  "generation": {
+    "elapsed_seconds": 5.934121600002982,
+    "python_version": "3.12.10",
+    "numpy_version": "2.5.4",
+    "platform": "Windows-11-10.0.26300-SP0"
+  }
+}
